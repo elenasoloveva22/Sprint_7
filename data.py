@@ -42,4 +42,3 @@ def get_limit_orders():
 def get_courier_id():
     """Возвращает случайный id курьера"""
     return generate_courier_id()
-

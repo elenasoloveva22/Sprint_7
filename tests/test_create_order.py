@@ -35,6 +35,8 @@ class TestCreateOrder:
             "comment": generate_comment(),
             "color": color
         }
-        response = requests.post(f'{MAIN_URL}{CREATE_ORDER_URL}', json=payload_order)
-        assert response.status_code == 201
-        assert 'track' in response.json()
+
+        with allure.step("Создание заказа"):
+            response = requests.post(f'{MAIN_URL}{CREATE_ORDER_URL}', json=payload_order)
+            assert response.status_code == 201
+            assert 'track' in response.json()

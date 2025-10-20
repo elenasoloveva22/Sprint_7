@@ -28,23 +28,30 @@ class TestGetOrderById:
             "comment": generate_comment(),
             "color": generate_color()
         }
-        response = requests.post(f'{MAIN_URL}{CREATE_ORDER_URL}', json=payload_order)
-        order_id = response.json()['track']
-        params = {"t": order_id}
-        response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
-        assert response.status_code == 200
-        assert 'order' in response.json()
+
+        with allure.step("Создание заказа"):
+            response = requests.post(f'{MAIN_URL}{CREATE_ORDER_URL}', json=payload_order)
+            assert response.status_code == 201
+            order_id = response.json()['track']
+
+        with allure.step("Получение заказа по номеру"):
+            params = {"t": order_id}
+            response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
+            assert response.status_code == 200
+            assert 'order' in response.json()
 
     @allure.title('Получить заказ без номера заказа - возвращает ошибку')
     def test_get_order_without_id_return_error(self):
         params = {"t": ""}
-        response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
-        assert response.status_code == 400
-        assert response.json() == {'code': 400, 'message': 'Недостаточно данных для поиска'}
+        with allure.step("Попытка получить заказ без номера"):
+            response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
+            assert response.status_code == 400
+            assert response.json() == {'code': 400, 'message': 'Недостаточно данных для поиска'}
 
     @allure.title('Получить заказ с несуществующим номером - возвращает ошибку')
     def test_get_order_by_not_exist_id_return_error(self):
         params = {"t": 999999}
-        response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
-        assert response.status_code == 404
-        assert response.json() == {'code': 404, 'message': 'Заказ не найден'}
+        with allure.step("Попытка получить заказ с несуществующим номером"):
+            response = requests.get(f'{MAIN_URL}{GET_ORDER_BY_ID_URL}', params=params)
+            assert response.status_code == 404
+            assert response.json() == {'code': 404, 'message': 'Заказ не найден'}
