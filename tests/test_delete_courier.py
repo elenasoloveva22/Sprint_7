@@ -10,13 +10,9 @@ class TestDeleteCourier:
         with allure.step("Попытка удалить несуществующего курьера"):
             response = requests.delete(f'{MAIN_URL}{CREATE_COURIER_URL}/{courier_id}')
 
-        with allure.step("Проверка ответа"):
-            if response.status_code == 404:
-                assert response.json().get('message') in ['Курьера с таким id нет.', 'Курьера с таким id не существует']
-            elif response.status_code == 400:
-                assert 'message' in response.json()
-            else:
-                assert False, f"Unexpected status code: {response.status_code}"
+        with allure.step("Проверка ответа - курьер не найден"):
+            assert response.status_code == 404
+            assert response.json() == {"code": 404, "message": "Курьера с таким id нет."}
 
     @allure.title('Удалить существующего курьера — успешный сценарий')
     def test_delete_courier_return_ok_true(self, create_courier):
@@ -39,10 +35,6 @@ class TestDeleteCourier:
         with allure.step("Попытка удалить курьера без указания id"):
             response = requests.delete(f'{MAIN_URL}{CREATE_COURIER_URL}')
 
-        with allure.step("Проверка ответа"):
-            if response.status_code == 400:
-                assert response.json().get('message') == 'Недостаточно данных для поиска'
-            elif response.status_code == 404:
-                assert response.json().get('message') == 'Not Found.'
-            else:
-                assert False, f"Unexpected status code: {response.status_code}"
+        with allure.step("Проверка ответа - неверный endpoint"):
+            assert response.status_code == 404
+            assert response.json() == {"code": 404, "message": "Not Found."}
